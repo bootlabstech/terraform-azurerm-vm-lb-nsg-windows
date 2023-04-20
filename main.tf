@@ -85,8 +85,8 @@ resource "azurerm_backup_protected_vm" "backup_protected_vm" {
   source_vm_id        = azurerm_windows_virtual_machine.example.id
   backup_policy_id    = data.azurerm_backup_policy_vm.policy.id
   depends_on = [
-    azurerm_windows_virtual_machine.virtual_machine,
-    azurerm_backup_policy_vm.backup_policy_vm
+    azurerm_windows_virtual_machine.example,
+    azurerm_backup_policy_vm.policy
   ]
 }
 
@@ -144,7 +144,7 @@ resource "azurerm_network_interface_backend_address_pool_association" "backend_a
   ip_configuration_name   = "${var.name}-ip"
   backend_address_pool_id = azurerm_lb_backend_address_pool.backend_pool.id
   depends_on = [
-    azurerm_network_interface.nic,
+    azurerm_network_interface.network_interface,
     azurerm_lb_backend_address_pool.backend_pool
   ]
 }
