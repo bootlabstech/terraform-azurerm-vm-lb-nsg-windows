@@ -140,7 +140,7 @@ resource "azurerm_lb_backend_address_pool" "backend_pool" {
 # This resource block was attaching load balancer to vm 
 resource "azurerm_network_interface_backend_address_pool_association" "backend_association" {
   network_interface_id    = azurerm_network_interface.network_interface.id
-  ip_configuration_name   = "${var.name}-ip"
+  ip_configuration_name   = var.ip_name
   backend_address_pool_id = azurerm_lb_backend_address_pool.backend_pool.id
   depends_on = [
     azurerm_network_interface.network_interface,
