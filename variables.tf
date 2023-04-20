@@ -67,7 +67,7 @@ variable "sku" {
 
 }
 
-variable "version" {
+variable "storage_image_version" {
   type        = string
   description = "Specifies the Operating System on the OS Disk. Possible values are Linux and Windows."
 
