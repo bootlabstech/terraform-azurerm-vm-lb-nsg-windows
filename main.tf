@@ -30,7 +30,7 @@ resource "azurerm_windows_virtual_machine" "example" {
 }
 # Creates Network Interface Card with private IP for Virtual Machine
 resource "azurerm_network_interface" "network_interface" {
-  name                = "{{.name}}-nic"
+  name                = "${var.name}-nic"
   location            = var.location
   resource_group_name = var.resource_group_name
   ip_configuration {
@@ -41,7 +41,7 @@ resource "azurerm_network_interface" "network_interface" {
 }
 # Creates Network Security Group NSG for Virtual Machine
 resource "azurerm_network_security_group" "nsg" {
-  name                = "{{.name}}-nsg"
+  name                = "${var.name}-nsg"
   location            = azurerm_windows_virtual_machine.example.location
   resource_group_name = azurerm_windows_virtual_machine.example.resource_group_name
 }
