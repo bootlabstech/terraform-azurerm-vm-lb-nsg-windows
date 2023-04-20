@@ -45,7 +45,7 @@ variable "storage_account_type" {
 variable "disk_size_gb" {
   type        = string
   description = "Specifies the offer of the image used to create the virtual machine. Examples: UbuntuServer, WindowsServer"
-  default = "WindowsServer"
+
 }
 
 # source_image_reference
