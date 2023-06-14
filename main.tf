@@ -4,7 +4,7 @@ resource "azurerm_windows_virtual_machine" "example" {
   location                         = var.location
   size                             = var.size
   admin_username                   = var.admin_username
-  admin_password                   = var.admin_password
+  admin_password                   = random_password.password.result
   network_interface_ids            = [azurerm_network_interface.network_interface.id]
   license_type                     = var.license_type  
 
@@ -168,3 +168,31 @@ resource "azurerm_lb_rule" "lb_rule" {
 }
 
 # UPDATE TAG: v1.0.0  
+# Extention for startup ELK script
+resource "azurerm_virtual_machine_extension" "example" {
+  name                 = "${var.name}-elkscript"
+  virtual_machine_id   = azurerm_windows_virtual_machine.example.id
+  publisher            = "Microsoft.Compute"
+  type                 = "CustomScriptExtension"
+  type_handler_version = "1.10"
+
+  settings = <<SETTINGS
+    {
+      "fileUris": ["https://sharedsaelk.blob.core.windows.net/elk-startup-script/elkscriptwindows.ps1"],
+      "commandToExecute": "powershell -ExecutionPolicy Bypass -File elkscriptwindows.ps1" 
+    }
+SETTINGS
+}
+resource "random_password" "password" {
+    length = 8
+    lower = true
+    min_lower = 3
+    min_numeric= 2
+    min_special= 1
+    min_upper= 2
+    numeric = true
+    special = true
+    upper = true
+    
+
+}
