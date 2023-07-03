@@ -1,72 +1,71 @@
 # virtual_machine
 variable "name" {
   type        = string
-  description = "Specifies the name of the Virtual Machine. Changing this forces a new resource to be created."
+  description = "Name for the virtual machine. Must not contain uppercase maximum of 15 characters length"
 }
 
 variable "resource_group_name" {
   type        = string
-  description = "name of the resource group"
+  description = "Name of the resource group inside which the VM will be created in"
 }
 
 variable "location" {
   type        = string
-  description = "location of the resource group"
+  description = "Location of the resource group. Must be one of following, Central India or South India"
 }
 
-
-
-variable "size" {
+variable "vm_size" {
   type        = string
-  description = "Specifies the size of the Virtual Machine. See also Azure VM Naming Conventions."
+  description = "Specifies the size of the Virtual Machine based on number of core and RAM.Refer documentation for all options"
 }
 
 variable "admin_username" {
   type        = string
   description = "Specifies the name of the local administrator account."
+  default     = "user01"
 }
-
 
 variable "license_type" {
   type        = string
-  description = "The pass"
-  
+  description = "The License type for Windows VM . Must be one of the values [None, Windows_Client, Windows_Server]"
+
 }
+
 # os_disk
 variable "storage_account_type" {
   type        = string
-  description = " Specifies the publisher of the image used to create the virtual machine. Examples: Canonical, MicrosoftWindowsServer"
-  default = "Standard_LRS"
+  description = "The Type of Storage Account which should back this the Internal OS Disk. Possible values are Standard_LRS, StandardSSD_LRS, Premium_LRS, StandardSSD_ZRS and Premium_ZRS"
+  default     = "Standard_LRS"
 }
 
 variable "disk_size_gb" {
   type        = string
-  description = "Specifies the offer of the image used to create the virtual machine. Examples: UbuntuServer, WindowsServer"
+  description = "The Size of the Internal OS Disk in GB, if you wish to vary from the size used in the image this Virtual Machine is sourced from."
 
 }
 
 # source_image_reference
 variable "publisher" {
   type        = string
-  description = "Specifies the caching requirements for the Data Disk. Possible values include None, ReadOnly and ReadWrite."
+  description = "Specifies the Publisher of the Marketplace Image this Virtual Machine should be created from.View documentation for all options"
   default     = "MicrosoftWindowsServer"
 }
 
 variable "offer" {
   type        = string
-  description = "Specifies how the data disk should be created. Possible values are Attach, FromImage and Empty."
+  description = " Specifies the offer of the image used to create the virtual machines.View documentation for all options "
   default     = "WindowsServer"
 }
 
 variable "sku" {
   type        = string
-  description = "Specifies the type of managed disk to create. Possible values are either Standard_LRS, StandardSSD_LRS, Premium_LRS or UltraSSD_LRS."
+  description = "Specifies the SKU of the image used to create the virtual machines.View documentation for all options"
 
 }
 
 variable "storage_image_version" {
   type        = string
-  description = "Specifies the Operating System on the OS Disk. Possible values are Linux and Windows."
+  description = "Specifies the Operating System version on the OS Disk. View documentation for all options"
 
 }
 
@@ -80,14 +79,15 @@ variable "ip_name" {
 
 variable "subnet_id" {
   type        = string
-  description = "The ID of the Subnet where this Network Interface should be located in."
+  description = "The ID of the Subnet where this Network Interface should be located in. Select subnet according to factors 1.application server (appsubnet) 2. web server (websubnet) 3. database server (dbsubnet)"
 }
 
 variable "private_ip_address_allocation" {
   type        = string
   description = "The allocation method used for the Private IP Address. Possible values are Dynamic and Static"
-  default = "Dynamic"
+  default     = "Dynamic"
 }
+
 # azurerm_network_security_rule
 variable "nsg_rules" {
   type = map(object({
@@ -115,14 +115,15 @@ variable "nsg_rules" {
     }
   }
 }
+
 # azurerm_recovery_services_vault
 variable "recovery_services_vault_name" {
   type        = string
-  description = "name of the azurerm_network_security_group"
+  description = "name of the recover service vault"
 }
 variable "services_vault_resource_group_name" {
   type        = string
-  description = "name of the azurerm_network_security_group"
+  description = "name of resource group where the recovery service vault reside in"
 }
 
 
@@ -130,7 +131,7 @@ variable "services_vault_resource_group_name" {
 
 variable "ip_version" {
   type        = string
-  description = "The IP Version to use"
+  description = "The IP Stack to use. One of values (IPv4,IPv6)"
   default     = "IPv4"
 }
 
