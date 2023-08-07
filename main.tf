@@ -25,6 +25,11 @@ resource "azurerm_windows_virtual_machine" "example" {
     sku       = var.sku
     version   = var.storage_image_version
   }
+  lifecycle {
+    ignore_changes = [
+      tags,
+    ]
+  }
   depends_on = [
     azurerm_network_interface.network_interface
   ]
@@ -41,6 +46,11 @@ resource "azurerm_network_interface" "network_interface" {
     subnet_id                     = var.subnet_id
     private_ip_address_allocation = var.private_ip_address_allocation
   }
+  lifecycle {
+    ignore_changes = [
+      tags,
+    ]
+  }
 }
 
 
@@ -49,6 +59,11 @@ resource "azurerm_network_security_group" "nsg" {
   name                = "${var.name}-nsg"
   location            = azurerm_windows_virtual_machine.example.location
   resource_group_name = azurerm_windows_virtual_machine.example.resource_group_name
+  lifecycle {
+    ignore_changes = [
+      tags,
+    ]
+  }
 }
 
 
