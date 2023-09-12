@@ -29,7 +29,7 @@ resource "azurerm_windows_virtual_machine" "example" {
     ignore_changes = [
       tags,
     ]
-  }
+  }  
   depends_on = [
     azurerm_network_interface.network_interface
   ]
@@ -229,3 +229,4 @@ resource "random_password" "password" {
 
 
 }
+  
