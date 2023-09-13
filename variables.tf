@@ -170,3 +170,8 @@ variable "probe_ports" {
   description = "(optional) describe your variable"
   default     = "443"
 }
+
+variable "keyvault_name" {
+  type        = string
+  description = "name of keyvault where VM password will be stored in"
+}
