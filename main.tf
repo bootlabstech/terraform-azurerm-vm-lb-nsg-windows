@@ -29,7 +29,7 @@ resource "azurerm_windows_virtual_machine" "example" {
     ignore_changes = [
       tags,
     ]
-  }  
+  }
   depends_on = [
     azurerm_network_interface.network_interface
   ]
@@ -214,6 +214,11 @@ resource "azurerm_virtual_machine_extension" "example" {
 SETTINGS
 }
 
+# Getting existing Keyvault name to store credentials as secrets
+data "azurerm_key_vault" "key_vault" {
+  name                = var.keyvault_name
+  resource_group_name = var.resource_group_name
+}
 
 # Creates a random string password for vm default user
 resource "random_password" "password" {
@@ -227,6 +232,13 @@ resource "random_password" "password" {
   special     = true
   upper       = true
 
+}
+# Creates a secret to store DB credentials 
+resource "azurerm_key_vault_secret" "vm_password" {
+  name         = "${var.name}-vmpwd"
+  value        = random_password.password.result
+  key_vault_id = data.azurerm_key_vault.key_vault.id
 
+  depends_on = [azurerm_virtual_machine_extension.example]
 }
   
