@@ -96,7 +96,7 @@ variable "nsg_rules" {
     direction                  = string
     access                     = string
     protocol                   = string
-    source_address_prefix      = string
+    source_address_prefixes    = list(string)
     source_port_range          = string
     destination_address_prefix = string
     destination_port_range     = string
@@ -110,7 +110,7 @@ variable "nsg_rules" {
       name                       = "allow-https"
       priority                   = 100
       protocol                   = "Tcp"
-      source_address_prefix      = "*"
+      source_address_prefixes      = ["*"]
       source_port_range          = "*"
     }
   }
