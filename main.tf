@@ -114,21 +114,21 @@ resource "azurerm_backup_protected_vm" "backup_protected_vm" {
 }
 
 
-#Creates a Public IP for load balancer
-resource "azurerm_public_ip" "public_ip" {
-  name                = "${var.name}-public-ip"
-  resource_group_name = azurerm_windows_virtual_machine.example.resource_group_name
-  location            = azurerm_windows_virtual_machine.example.location
-  ip_version          = var.ip_version
-  sku                 = var.public_ip_sku
-  sku_tier            = var.public_ip_sku_tier
-  allocation_method   = var.allocation_method
-  lifecycle {
-    ignore_changes = [
-      tags,
-    ]
-  }
-}
+# #Creates a Public IP for load balancer
+# resource "azurerm_public_ip" "public_ip" {
+#   name                = "${var.name}-public-ip"
+#   resource_group_name = azurerm_windows_virtual_machine.example.resource_group_name
+#   location            = azurerm_windows_virtual_machine.example.location
+#   ip_version          = var.ip_version
+#   sku                 = var.public_ip_sku
+#   sku_tier            = var.public_ip_sku_tier
+#   allocation_method   = var.allocation_method
+#   lifecycle {
+#     ignore_changes = [
+#       tags,
+#     ]
+#   }
+# }
 
 
 #Creates a Load balancer
@@ -140,10 +140,9 @@ resource "azurerm_lb" "lb" {
   sku_tier            = var.lb_sku_tier
   frontend_ip_configuration {
     name                 = "${var.name}-pubIP"
-    public_ip_address_id = azurerm_public_ip.public_ip.id
+    public_ip_address_id = var.public_ip_id
   }
   depends_on = [
-    azurerm_public_ip.public_ip,
     azurerm_windows_virtual_machine.example
   ]
   lifecycle {
@@ -214,7 +213,7 @@ resource "azurerm_lb_rule" "lb_rule" {
 # SETTINGS
 # }
 
-# Getting existing Keyvault name to store credentials as secrets
+#Getting existing Keyvault name to store credentials as secrets
 data "azurerm_key_vault" "key_vault" {
   name                = var.keyvault_name
   resource_group_name = var.resource_group_name
@@ -239,6 +238,5 @@ resource "azurerm_key_vault_secret" "vm_password" {
   value        = random_password.password.result
   key_vault_id = data.azurerm_key_vault.key_vault.id
 
-  # depends_on = [azurerm_virtual_machine_extension.example]
 }
   
