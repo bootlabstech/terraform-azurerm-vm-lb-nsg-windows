@@ -145,29 +145,29 @@ variable "services_vault_resource_group_name" {
 
 //load_balancer 
 
-# variable "ip_version" {
-#   type        = string
-#   description = "The IP Stack to use. One of values (IPv4,IPv6)"
-#   default     = "IPv4"
-# }
+variable "ip_version" {
+  type        = string
+  description = "The IP Stack to use. One of values (IPv4,IPv6)"
+  default     = "IPv4"
+}
 
-# variable "public_ip_sku" {
-#   description = "The SKU Tier that should be used for the Public IP. Possible values are Regional and Global"
-#   type        = string
-#   default     = "Standard"
-# }
+variable "public_ip_sku" {
+  description = "The SKU Tier that should be used for the Public IP. Possible values are Regional and Global"
+  type        = string
+  default     = "Standard"
+}
 
-# variable "public_ip_sku_tier" {
-#   description = "The SKU Tier that should be used for the Public IP. Possible values are Regional and Global, NOTE ---- When sku_tier is set to Global, sku must be set to Standard"
-#   type        = string
-#   default     = "Regional"
-# }
+variable "public_ip_sku_tier" {
+  description = "The SKU Tier that should be used for the Public IP. Possible values are Regional and Global, NOTE ---- When sku_tier is set to Global, sku must be set to Standard"
+  type        = string
+  default     = "Regional"
+}
 
-# variable "allocation_method" {
-#   type        = string
-#   description = "Defines the allocation method for this IP address. Possible values are Static or Dynamic"
-#   default     = "Static"
-# }
+variable "allocation_method" {
+  type        = string
+  description = "Defines the allocation method for this IP address. Possible values are Static or Dynamic"
+  default     = "Static"
+}
 
 variable "lb_sku" {
   type        = string
@@ -192,7 +192,7 @@ variable "keyvault_name" {
   description = "name of keyvault where VM password will be stored in"
 }
 
-variable "public_ip_id" {
-  type = string
+# variable "public_ip_id" {
+#   type = string
   
-}
+# }
