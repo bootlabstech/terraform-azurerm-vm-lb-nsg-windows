@@ -196,3 +196,7 @@ variable "keyvault_name" {
 #   type = string
   
 # }
+variable "image_id" {
+  type = string
+  
+}

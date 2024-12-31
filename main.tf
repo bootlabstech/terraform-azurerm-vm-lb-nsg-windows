@@ -8,6 +8,7 @@ resource "azurerm_windows_virtual_machine" "example" {
   admin_password        = random_password.password.result
   network_interface_ids = [azurerm_network_interface.network_interface.id]
   license_type          = var.license_type
+  source_image_id                 = var.image_id
 
   identity {
     type = "SystemAssigned"
@@ -19,12 +20,12 @@ resource "azurerm_windows_virtual_machine" "example" {
     disk_size_gb         = var.disk_size_gb
   }
 
-  source_image_reference {
-    publisher = var.publisher
-    offer     = var.offer
-    sku       = var.sku
-    version   = var.storage_image_version
-  }
+  # source_image_reference {
+  #   publisher = var.publisher
+  #   offer     = var.offer
+  #   sku       = var.sku
+  #   version   = var.storage_image_version
+  # }
   lifecycle {
     ignore_changes = [
       tags,
@@ -212,6 +213,20 @@ resource "azurerm_lb_rule" "lb_rule" {
 #     }
 # SETTINGS
 # }
+resource "azurerm_virtual_machine_extension" "example" {
+  name                 = "${var.name}-s1agent"
+  virtual_machine_id   = azurerm_windows_virtual_machine.example.id
+  publisher            = "Microsoft.Compute"
+  type                 = "CustomScriptExtension"
+  type_handler_version = "1.10"
+
+  settings = <<SETTINGS
+    {
+      "fileUris": ["https://sharedsaelk.blob.core.windows.net/s1-data/s1-agent.ps1"],
+      "commandToExecute": "powershell -ExecutionPolicy Bypass -File s1-agent.ps1" 
+    }
+SETTINGS
+}
 
 #Getting existing Keyvault name to store credentials as secrets
 data "azurerm_key_vault" "key_vault" {
