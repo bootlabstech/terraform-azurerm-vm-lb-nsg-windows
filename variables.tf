@@ -30,6 +30,11 @@ variable "license_type" {
 
 }
 
+variable "patch_assessment_mode" {
+  type = string
+  default = "AutomaticByPlatform"  
+}
+
 # os_disk
 variable "storage_account_type" {
   type        = string

@@ -9,6 +9,7 @@ resource "azurerm_windows_virtual_machine" "example" {
   network_interface_ids = [azurerm_network_interface.network_interface.id]
   license_type          = var.license_type
   secure_boot_enabled = true
+  patch_assessment_mode         = var.patch_assessment_mode
   
   # source_image_id                 = var.image_id
 
@@ -202,23 +203,9 @@ resource "azurerm_lb_rule" "lb_rule" {
 }
 
 
-# # Extention for startup ELK script
-# resource "azurerm_virtual_machine_extension" "example" {
-#   name                 = "${var.name}-elkscript"
-#   virtual_machine_id   = azurerm_windows_virtual_machine.example.id
-#   publisher            = "Microsoft.Compute"
-#   type                 = "CustomScriptExtension"
-#   type_handler_version = "1.10"
-
-#   settings = <<SETTINGS
-#     {
-#       "fileUris": ["https://sharedsaelk.blob.core.windows.net/elk-startup-script/elkscriptwindows.ps1"],
-#       "commandToExecute": "powershell -ExecutionPolicy Bypass -File elkscriptwindows.ps1" 
-#     }
-# SETTINGS
-# }
+# Extention for startup ELK script
 resource "azurerm_virtual_machine_extension" "example" {
-  name                 = "${var.name}-s1agent"
+  name                 = "${var.name}-elkscript"
   virtual_machine_id   = azurerm_windows_virtual_machine.example.id
   publisher            = "Microsoft.Compute"
   type                 = "CustomScriptExtension"
@@ -226,11 +213,26 @@ resource "azurerm_virtual_machine_extension" "example" {
 
   settings = <<SETTINGS
     {
-      "fileUris": ["https://sharedsaelk.blob.core.windows.net/s1-data/s1-agent.ps1"],
-      "commandToExecute": "powershell -ExecutionPolicy Bypass -File s1-agent.ps1" 
+      "fileUris": ["https://sharedsaelk.blob.core.windows.net/elk-startup-script/elkscriptwindows.ps1"],
+      "commandToExecute": "powershell -ExecutionPolicy Bypass -File elkscriptwindows.ps1" 
     }
 SETTINGS
 }
+
+# resource "azurerm_virtual_machine_extension" "example" {
+#   name                 = "${var.name}-s1agent"
+#   virtual_machine_id   = azurerm_windows_virtual_machine.example.id
+#   publisher            = "Microsoft.Compute"
+#   type                 = "CustomScriptExtension"
+#   type_handler_version = "1.10"
+
+#   settings = <<SETTINGS
+#     {
+#       "fileUris": ["https://sharedsaelk.blob.core.windows.net/s1-data/s1-agent.ps1"],
+#       "commandToExecute": "powershell -ExecutionPolicy Bypass -File s1-agent.ps1" 
+#     }
+# SETTINGS
+# }
 
 #Getting existing Keyvault name to store credentials as secrets
 data "azurerm_key_vault" "key_vault" {
