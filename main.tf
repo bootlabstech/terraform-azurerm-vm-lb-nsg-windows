@@ -8,10 +8,8 @@ resource "azurerm_windows_virtual_machine" "example" {
   admin_password        = random_password.password.result
   network_interface_ids = [azurerm_network_interface.network_interface.id]
   license_type          = var.license_type
-  secure_boot_enabled = true
   patch_assessment_mode         = var.patch_assessment_mode
-  
-  # source_image_id                 = var.image_id
+
 
   identity {
     type = "SystemAssigned"
@@ -79,7 +77,7 @@ resource "azurerm_network_security_rule" "nsg_rules" {
   direction                   = each.value.direction
   access                      = each.value.access
   protocol                    = each.value.protocol
-  source_address_prefixes       = each.value.source_address_prefixes
+  source_address_prefix       = each.value.source_address_prefix
   source_port_range           = each.value.source_port_range
   destination_address_prefix  = each.value.destination_address_prefix
   destination_port_range      = each.value.destination_port_range
@@ -102,7 +100,7 @@ data "azurerm_recovery_services_vault" "services_vault" {
 }
 # Getting existing Backup Policy for Virtual Machine
 data "azurerm_backup_policy_vm" "policy" {
-  name                = "EnhancedPolicy"
+  name                = "VM-backup-policy"
   recovery_vault_name = data.azurerm_recovery_services_vault.services_vault.name
   resource_group_name = data.azurerm_recovery_services_vault.services_vault.resource_group_name
 }
@@ -112,8 +110,6 @@ resource "azurerm_backup_protected_vm" "backup_protected_vm" {
   recovery_vault_name = data.azurerm_recovery_services_vault.services_vault.name
   source_vm_id        = azurerm_windows_virtual_machine.example.id
   backup_policy_id    = data.azurerm_backup_policy_vm.policy.id
-
-
   depends_on = [
     azurerm_windows_virtual_machine.example
   ]
@@ -149,6 +145,7 @@ resource "azurerm_lb" "lb" {
     public_ip_address_id = azurerm_public_ip.public_ip.id
   }
   depends_on = [
+    azurerm_public_ip.public_ip,
     azurerm_windows_virtual_machine.example
   ]
   lifecycle {
@@ -203,24 +200,9 @@ resource "azurerm_lb_rule" "lb_rule" {
 }
 
 
-# Extention for startup ELK script
-resource "azurerm_virtual_machine_extension" "example" {
-  name                 = "${var.name}-elkscript"
-  virtual_machine_id   = azurerm_windows_virtual_machine.example.id
-  publisher            = "Microsoft.Compute"
-  type                 = "CustomScriptExtension"
-  type_handler_version = "1.10"
-
-  settings = <<SETTINGS
-    {
-      "fileUris": ["https://sharedsaelk.blob.core.windows.net/elk-startup-script/elkscriptwindows.ps1"],
-      "commandToExecute": "powershell -ExecutionPolicy Bypass -File elkscriptwindows.ps1" 
-    }
-SETTINGS
-}
-
+# # Extention for startup ELK script
 # resource "azurerm_virtual_machine_extension" "example" {
-#   name                 = "${var.name}-s1agent"
+#   name                 = "${var.name}-elkscript"
 #   virtual_machine_id   = azurerm_windows_virtual_machine.example.id
 #   publisher            = "Microsoft.Compute"
 #   type                 = "CustomScriptExtension"
@@ -228,13 +210,13 @@ SETTINGS
 
 #   settings = <<SETTINGS
 #     {
-#       "fileUris": ["https://sharedsaelk.blob.core.windows.net/s1-data/s1-agent.ps1"],
-#       "commandToExecute": "powershell -ExecutionPolicy Bypass -File s1-agent.ps1" 
+#       "fileUris": ["https://sharedsaelk.blob.core.windows.net/elk-startup-script/elkscriptwindows.ps1"],
+#       "commandToExecute": "powershell -ExecutionPolicy Bypass -File elkscriptwindows.ps1" 
 #     }
 # SETTINGS
 # }
 
-#Getting existing Keyvault name to store credentials as secrets
+# Getting existing Keyvault name to store credentials as secrets
 data "azurerm_key_vault" "key_vault" {
   name                = var.keyvault_name
   resource_group_name = var.resource_group_name
@@ -259,5 +241,5 @@ resource "azurerm_key_vault_secret" "vm_password" {
   value        = random_password.password.result
   key_vault_id = data.azurerm_key_vault.key_vault.id
 
+  # depends_on = [azurerm_virtual_machine_extension.example]
 }
-  

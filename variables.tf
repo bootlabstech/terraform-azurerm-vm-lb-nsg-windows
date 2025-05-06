@@ -33,7 +33,7 @@ variable "license_type" {
 variable "patch_assessment_mode" {
   type = string
   default = "AutomaticByPlatform"  
-}
+}     
 
 # os_disk
 variable "storage_account_type" {
@@ -48,25 +48,28 @@ variable "disk_size_gb" {
 
 }
 
- # source_image_reference
- variable "publisher" {
-   type        = string
-   description = "Specifies the Publisher of the Marketplace Image this Virtual Machine should be created from.View documentation for all options"
-   default     = "MicrosoftWindowsServer"
- }
- variable "offer" {
-   type        = string
-   description = " Specifies the offer of the image used to create the virtual machines.View documentation for all options "
-   default     = "WindowsServer"
- }
- variable "sku" {
-   type        = string
-   description = "Specifies the SKU of the image used to create the virtual machines.View documentation for all options"
- }
+# source_image_reference
+variable "publisher" {
+  type        = string
+  description = "Specifies the Publisher of the Marketplace Image this Virtual Machine should be created from.View documentation for all options"
+  default     = "MicrosoftWindowsServer"
+}
 
- variable "storage_image_version" {
-   type        = string
-   description = "Specifies the Operating System version on the OS Disk. View documentation for all options"
+variable "offer" {
+  type        = string
+  description = " Specifies the offer of the image used to create the virtual machines.View documentation for all options "
+  default     = "WindowsServer"
+}
+
+variable "sku" {
+  type        = string
+  description = "Specifies the SKU of the image used to create the virtual machines.View documentation for all options"
+
+}
+
+variable "storage_image_version" {
+  type        = string
+  description = "Specifies the Operating System version on the OS Disk. View documentation for all options"
   default = "latest"
 
 }
@@ -98,7 +101,7 @@ variable "nsg_rules" {
     direction                  = string
     access                     = string
     protocol                   = string
-    source_address_prefixes    = list(string)
+    source_address_prefix      = string
     source_port_range          = string
     destination_address_prefix = string
     destination_port_range     = string
@@ -112,23 +115,7 @@ variable "nsg_rules" {
       name                       = "allow-https"
       priority                   = 100
       protocol                   = "Tcp"
-      source_address_prefixes      = [
-         "173.245.48.0/20",
-         "103.21.244.0/22",
-         "103.22.200.0/22",
-         "103.31.4.0/22",
-         "141.101.64.0/18",
-         "108.162.192.0/18",
-         "190.93.240.0/20",
-         "188.114.96.0/20",
-         "197.234.240.0/22",
-         "198.41.128.0/17",
-         "162.158.0.0/15",
-         "104.16.0.0/13",
-         "104.24.0.0/14",
-         "172.64.0.0/13",
-         "131.0.72.0/22"
-        ]
+      source_address_prefix      = "*"
       source_port_range          = "*"
     }
   }
@@ -193,8 +180,3 @@ variable "keyvault_name" {
   type        = string
   description = "name of keyvault where VM password will be stored in"
 }
-
-# variable "public_ip_id" {
-#   type = string
-  
-# }
