@@ -200,21 +200,25 @@ resource "azurerm_lb_rule" "lb_rule" {
 }
 
 
-# # Extention for startup ELK script
-# resource "azurerm_virtual_machine_extension" "example" {
-#   name                 = "${var.name}-elkscript"
-#   virtual_machine_id   = azurerm_windows_virtual_machine.example.id
-#   publisher            = "Microsoft.Compute"
-#   type                 = "CustomScriptExtension"
-#   type_handler_version = "1.10"
+# Extention for startup ELK script
+resource "azurerm_virtual_machine_extension" "example" {
+  name                 = "${var.name}-elkscript"
+  virtual_machine_id   = azurerm_windows_virtual_machine.example.id
+  publisher            = "Microsoft.Compute"
+  type                 = "CustomScriptExtension"
+  type_handler_version = "1.10"
+  auto_upgrade_minor_version = false
+  automatic_upgrade_enabled  = false
+  failure_suppression_enabled = false
 
-#   settings = <<SETTINGS
-#     {
-#       "fileUris": ["https://sharedsaelk.blob.core.windows.net/elk-startup-script/elkscriptwindows.ps1"],
-#       "commandToExecute": "powershell -ExecutionPolicy Bypass -File elkscriptwindows.ps1" 
-#     }
-# SETTINGS
-# }
+  settings = <<SETTINGS
+    {
+      "fileUris": ["https://sharedsaelk.blob.core.windows.net/elk-startup-script/elkscriptwindows.ps1"],
+      "commandToExecute": "powershell -ExecutionPolicy Bypass -File elkscriptwindows.ps1" 
+    }
+SETTINGS
+  tags = {}
+}
 
 # Getting existing Keyvault name to store credentials as secrets
 data "azurerm_key_vault" "key_vault" {
