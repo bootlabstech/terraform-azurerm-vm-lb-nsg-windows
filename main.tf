@@ -7,6 +7,7 @@ resource "azurerm_windows_virtual_machine" "example" {
   admin_password                   = var.admin_password
   network_interface_ids            = [azurerm_network_interface.network_interface.id]
   license_type                     = var.license_type  
+  patch_assessment_mode      = "AutomaticByPlatform"
 
   identity {
     type = "SystemAssigned"
@@ -54,12 +55,29 @@ resource "azurerm_network_security_rule" "nsg_rules" {
   direction                   = each.value.direction
   access                      = each.value.access
   protocol                    = each.value.protocol
-  source_address_prefix       = each.value.source_address_prefix
+  # source_address_prefix       = each.value.source_address_prefix
   source_port_range           = each.value.source_port_range
   destination_address_prefix  = each.value.destination_address_prefix
   destination_port_range      = each.value.destination_port_range
   network_security_group_name = azurerm_network_security_group.nsg.name
   resource_group_name         = azurerm_windows_virtual_machine.example.resource_group_name
+  source_address_prefixes = [
+    "103.21.244.0/22",
+    "103.22.200.0/22",
+    "103.31.4.0/22",
+    "104.16.0.0/13",
+    "104.24.0.0/14",
+    "108.162.192.0/18",
+    "131.0.72.0/22",
+    "141.101.64.0/18",
+    "162.158.0.0/15",
+    "172.64.0.0/13",
+    "173.245.48.0/20",
+    "188.114.96.0/20",
+    "190.93.240.0/20",
+    "197.234.240.0/22",
+    "198.41.128.0/17"
+  ]
 }
 # Creates association (i.e) adds NSG to the NIC
 resource "azurerm_network_interface_security_group_association" "security_group_association" {
@@ -165,6 +183,7 @@ resource "azurerm_lb_rule" "lb_rule" {
   frontend_ip_configuration_name = "${var.name}-pubIP"
   probe_id                       = azurerm_lb_probe.lb_probe.id
   backend_address_pool_ids       = [azurerm_lb_backend_address_pool.backend_pool.id]
+  disable_outbound_snat          = true
 }
 
 # UPDATE TAG: v1.0.0  
