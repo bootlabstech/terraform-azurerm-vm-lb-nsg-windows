@@ -1,15 +1,12 @@
-# Creates a Azure Windows Virtual machine
 resource "azurerm_windows_virtual_machine" "example" {
-  name                  = var.name
-  resource_group_name   = var.resource_group_name
-  location              = var.location
-  size                  = var.vm_size
-  admin_username        = var.admin_username
-  admin_password        = random_password.password.result
-  network_interface_ids = [azurerm_network_interface.network_interface.id]
-  license_type          = var.license_type
-  patch_assessment_mode         = var.patch_assessment_mode
-
+  name                             = var.name
+  resource_group_name              = var.resource_group_name
+  location                         = var.location
+  size                             = var.size
+  admin_username                   = var.admin_username
+  admin_password                   = var.admin_password
+  network_interface_ids            = [azurerm_network_interface.network_interface.id]
+  license_type                     = var.license_type  
 
   identity {
     type = "SystemAssigned"
@@ -17,27 +14,20 @@ resource "azurerm_windows_virtual_machine" "example" {
   os_disk {
     name                 = "${var.name}-disk"
     caching              = "ReadWrite"
-    storage_account_type = var.storage_account_type
-    disk_size_gb         = var.disk_size_gb
+    storage_account_type =  var.storage_account_type #"Standard_LRS"
+    disk_size_gb = var.disk_size_gb
   }
 
   source_image_reference {
-    publisher = var.publisher
-    offer     = var.offer
-    sku       = var.sku
+    publisher = var.publisher #MicrosoftWindowsServer:WindowsServer:2022-datacenter-azure-edition:20348.1006.220908
+    offer     = var.offer  #MicrosoftWindowsServer:WindowsServer:2019-datacenter-core-g2:17763.2686.220303
+    sku       = var.sku #MicrosoftWindowsServer:WindowsServer:2016-datacenter-gensecond:14393.5006.220305
     version   = var.storage_image_version
   }
-  lifecycle {
-    ignore_changes = [
-      tags,
-    ]
-  }
-  depends_on = [
+   depends_on = [
     azurerm_network_interface.network_interface
   ]
 }
-
-
 # Creates Network Interface Card with private IP for Virtual Machine
 resource "azurerm_network_interface" "network_interface" {
   name                = "${var.name}-nic"
@@ -48,28 +38,15 @@ resource "azurerm_network_interface" "network_interface" {
     subnet_id                     = var.subnet_id
     private_ip_address_allocation = var.private_ip_address_allocation
   }
-  lifecycle {
-    ignore_changes = [
-      tags,
-    ]
-  }
 }
-
-
 # Creates Network Security Group NSG for Virtual Machine
 resource "azurerm_network_security_group" "nsg" {
   name                = "${var.name}-nsg"
   location            = azurerm_windows_virtual_machine.example.location
   resource_group_name = azurerm_windows_virtual_machine.example.resource_group_name
-  lifecycle {
-    ignore_changes = [
-      tags,
-    ]
-  }
 }
-
-
 # Creates Network Security Group Default Rules for Virtual Machine
+
 resource "azurerm_network_security_rule" "nsg_rules" {
   for_each                    = var.nsg_rules
   name                        = each.value.name
@@ -84,14 +61,11 @@ resource "azurerm_network_security_rule" "nsg_rules" {
   network_security_group_name = azurerm_network_security_group.nsg.name
   resource_group_name         = azurerm_windows_virtual_machine.example.resource_group_name
 }
-
-
 # Creates association (i.e) adds NSG to the NIC
 resource "azurerm_network_interface_security_group_association" "security_group_association" {
   network_interface_id      = azurerm_network_interface.network_interface.id
   network_security_group_id = azurerm_network_security_group.nsg.id
 }
-
 
 # Getting existing recovery_services_vault to add vm as a backup item 
 data "azurerm_recovery_services_vault" "services_vault" {
@@ -111,14 +85,15 @@ resource "azurerm_backup_protected_vm" "backup_protected_vm" {
   source_vm_id        = azurerm_windows_virtual_machine.example.id
   backup_policy_id    = data.azurerm_backup_policy_vm.policy.id
   depends_on = [
-    azurerm_windows_virtual_machine.example
+    azurerm_windows_virtual_machine.example,
   ]
 }
 
 
-#Creates a Public IP for load balancer
+# Load Balancer
+
 resource "azurerm_public_ip" "public_ip" {
-  name                = "${var.name}-public-ip"
+  name                = "${var.name}-ip"
   resource_group_name = azurerm_windows_virtual_machine.example.resource_group_name
   location            = azurerm_windows_virtual_machine.example.location
   ip_version          = var.ip_version
@@ -132,8 +107,6 @@ resource "azurerm_public_ip" "public_ip" {
   }
 }
 
-
-#Creates a Load balancer
 resource "azurerm_lb" "lb" {
   name                = "${var.name}-lb"
   resource_group_name = azurerm_windows_virtual_machine.example.resource_group_name
@@ -155,8 +128,6 @@ resource "azurerm_lb" "lb" {
   }
 }
 
-
-# Creates Backenf address pool for LB
 resource "azurerm_lb_backend_address_pool" "backend_pool" {
   name            = "${var.name}-backend_pool"
   loadbalancer_id = azurerm_lb.lb.id
@@ -166,7 +137,7 @@ resource "azurerm_lb_backend_address_pool" "backend_pool" {
 }
 
 
-# Creates association between LB and vm 
+# This resource block was attaching load balancer to vm 
 resource "azurerm_network_interface_backend_address_pool_association" "backend_association" {
   network_interface_id    = azurerm_network_interface.network_interface.id
   ip_configuration_name   = var.ip_name
@@ -178,7 +149,6 @@ resource "azurerm_network_interface_backend_address_pool_association" "backend_a
 }
 
 
-# Creates a load balancer probe
 resource "azurerm_lb_probe" "lb_probe" {
   loadbalancer_id = azurerm_lb.lb.id
   name            = "https"
@@ -186,8 +156,6 @@ resource "azurerm_lb_probe" "lb_probe" {
 
 }
 
-
-# Creates a Load balancer rule with deafult rules
 resource "azurerm_lb_rule" "lb_rule" {
   loadbalancer_id                = azurerm_lb.lb.id
   name                           = "htpps"
@@ -199,51 +167,4 @@ resource "azurerm_lb_rule" "lb_rule" {
   backend_address_pool_ids       = [azurerm_lb_backend_address_pool.backend_pool.id]
 }
 
-
-# Extention for startup ELK script
-resource "azurerm_virtual_machine_extension" "example" {
-  name                 = "${var.name}-elkscript"
-  virtual_machine_id   = azurerm_windows_virtual_machine.example.id
-  publisher            = "Microsoft.Compute"
-  type                 = "CustomScriptExtension"
-  type_handler_version = "1.10"
-  auto_upgrade_minor_version = false
-  automatic_upgrade_enabled  = false
-  failure_suppression_enabled = false
-
-  settings = <<SETTINGS
-    {
-      "fileUris": ["https://sharedsaelk.blob.core.windows.net/elk-startup-script/elkscriptwindows.ps1"],
-      "commandToExecute": "powershell -ExecutionPolicy Bypass -File elkscriptwindows.ps1" 
-    }
-SETTINGS
-  tags = {}
-}
-
-# Getting existing Keyvault name to store credentials as secrets
-data "azurerm_key_vault" "key_vault" {
-  name                = var.keyvault_name
-  resource_group_name = var.resource_group_name
-}
-
-# Creates a random string password for vm default user
-resource "random_password" "password" {
-  length      = 12
-  lower       = true
-  min_lower   = 6
-  min_numeric = 2
-  min_special = 2
-  min_upper   = 2
-  numeric     = true
-  special     = true
-  upper       = true
-
-}
-# Creates a secret to store DB credentials 
-resource "azurerm_key_vault_secret" "vm_password" {
-  name         = "${var.name}-vmpwd"
-  value        = random_password.password.result
-  key_vault_id = data.azurerm_key_vault.key_vault.id
-
-  # depends_on = [azurerm_virtual_machine_extension.example]
-}
+# UPDATE TAG: v1.0.0  
