@@ -8,9 +8,11 @@ resource "azurerm_windows_virtual_machine" "example" {
   admin_password        = random_password.password.result
   network_interface_ids = [azurerm_network_interface.network_interface.id]
   license_type          = var.license_type
-  secure_boot_enabled = true
-  
-  # source_image_id                 = var.image_id
+  secure_boot_enabled = var.secure_boot_enabled
+  patch_assessment_mode         = var.patch_assessment_mode
+  patch_mode                    = var.patch_mode 
+  source_image_id                 = var.image_id
+
 
   identity {
     type = "SystemAssigned"
@@ -22,12 +24,12 @@ resource "azurerm_windows_virtual_machine" "example" {
     disk_size_gb         = var.disk_size_gb
   }
 
-  source_image_reference {
-    publisher = var.publisher
-    offer     = var.offer
-    sku       = var.sku
-    version   = var.storage_image_version
-  }
+  # source_image_reference {
+  #   publisher = var.publisher
+  #   offer     = var.offer
+  #   sku       = var.sku
+  #   version   = var.storage_image_version
+  # }
   lifecycle {
     ignore_changes = [
       tags,
