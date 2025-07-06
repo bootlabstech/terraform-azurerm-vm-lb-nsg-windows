@@ -43,31 +43,6 @@ variable "disk_size_gb" {
 
 }
 
-# # source_image_reference
-# variable "publisher" {
-#   type        = string
-#   description = "Specifies the Publisher of the Marketplace Image this Virtual Machine should be created from.View documentation for all options"
-#   default     = "MicrosoftWindowsServer"
-# }
-
-# variable "offer" {
-#   type        = string
-#   description = " Specifies the offer of the image used to create the virtual machines.View documentation for all options "
-#   default     = "WindowsServer"
-# }
-
-# variable "sku" {
-#   type        = string
-#   description = "Specifies the SKU of the image used to create the virtual machines.View documentation for all options"
-
-# }
-
-# variable "storage_image_version" {
-#   type        = string
-#   description = "Specifies the Operating System version on the OS Disk. View documentation for all options"
-#   default = "latest"
-
-# }
 
 
 # azurerm_network_interface
@@ -192,25 +167,13 @@ variable "keyvault_name" {
   description = "name of keyvault where VM password will be stored in"
 }
 
-# variable "public_ip_id" {
-#   type = string
-  
-# }
 variable "image_id" {
   type = string
   
 }
 variable "secure_boot_enabled" {
   type        = bool
-  default = false
+  default = true
   
 }
 
-variable "patch_assessment_mode" {
-  default = "ImageDefault"
-  type = string  
-}
-variable "patch_mode" {
-  default = "AutomaticByOS"
-  type = string  
-}
