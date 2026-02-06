@@ -8,6 +8,9 @@ resource "azurerm_windows_virtual_machine" "example" {
   admin_password        = random_password.password.result
   network_interface_ids = [azurerm_network_interface.network_interface.id]
   license_type          = var.license_type
+  secure_boot_enabled = var.secure_boot_enabled
+  vtpm_enabled = var.secure_boot_enabled
+  
 
   identity {
     type = "SystemAssigned"
@@ -35,6 +38,11 @@ resource "azurerm_windows_virtual_machine" "example" {
   ]
 }
 
+resource "azurerm_disk_access" "azurerm_disk_access" {
+  name                = "${var.name}-diskacc"
+  resource_group_name = var.resource_group_name
+  location            = var.location
+}
 
 # Creates Network Interface Card with private IP for Virtual Machine
 resource "azurerm_network_interface" "network_interface" {

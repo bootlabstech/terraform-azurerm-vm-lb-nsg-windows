@@ -196,3 +196,13 @@ variable "keyvault_name" {
 #   type = string
   
 # }
+variable "secure_boot_enabled" {
+  type = bool
+  default = "true"
+  
+}
+variable "vtpm_enabled" {
+  type = bool
+  default = "true"
+  
+}
