@@ -206,3 +206,6 @@ variable "vtpm_enabled" {
   default = "true"
   
 }
+variable "environment" {
+  type = string
+}
