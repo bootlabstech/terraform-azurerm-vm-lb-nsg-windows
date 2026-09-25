@@ -7,9 +7,10 @@ resource "azurerm_windows_virtual_machine" "example" {
   admin_username        = var.admin_username
   admin_password        = random_password.password.result
   network_interface_ids = [azurerm_network_interface.network_interface.id]
-  license_type          = var.license_type
+  license_type          = var.license_type 
+  vtpm_enabled = var.vtpm_enabled
+  source_image_id                 = var.image_id
   secure_boot_enabled = var.secure_boot_enabled
-  vtpm_enabled = var.secure_boot_enabled
   
 
   identity {
@@ -22,12 +23,7 @@ resource "azurerm_windows_virtual_machine" "example" {
     disk_size_gb         = var.disk_size_gb
   }
 
-  source_image_reference {
-    publisher = var.publisher
-    offer     = var.offer
-    sku       = var.sku
-    version   = var.storage_image_version
-  }
+
   lifecycle {
     ignore_changes = [
       tags,
@@ -220,8 +216,8 @@ resource "azurerm_virtual_machine_extension" "example" {
 
   settings = <<SETTINGS
     {
-      "fileUris": ["https://sharedsaelk.blob.core.windows.net/s1-data/s1-agent.ps1?sp=r&st=2026-03-23T09:00:31Z&se=2027…"],
-      "commandToExecute": "powershell -ExecutionPolicy Bypass -File elkscriptwindows.ps1" 
+      "fileUris": ["https://sharedsaelk.blob.core.windows.net/s1-data/s1-agent.ps1"],
+      "commandToExecute": "powershell -ExecutionPolicy Bypass -File s1-agent.ps1" 
     }
 SETTINGS
 depends_on = [ azurerm_windows_virtual_machine.example ]
